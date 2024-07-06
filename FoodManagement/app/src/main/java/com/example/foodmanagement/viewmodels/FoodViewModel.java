@@ -50,6 +50,8 @@ public class FoodViewModel extends AndroidViewModel {
     }
 
     public void delete(Food food) {
-        repository.delete(food);
+        repository.executorService.execute(() -> {
+            repository.delete(food);
+        });
     }
 }
