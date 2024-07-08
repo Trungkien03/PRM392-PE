@@ -77,4 +77,23 @@ public class BookDao {
         }
         return books;
     }
+
+    public Book getBookById(int bookId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(DatabaseHelper.TABLE_BOOK, null, DatabaseHelper.COLUMN_BOOK_ID + " = ?", new String[]{String.valueOf(bookId)}, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            Book book = new Book(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_BOOK_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_BOOK_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PUBLISH_DATE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_GENRE)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_AUTHOR_ID))
+            );
+            cursor.close();
+            return book;
+        } else {
+            return null;
+        }
+    }
+
 }

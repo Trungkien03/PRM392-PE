@@ -38,6 +38,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1")
     implementation("androidx.lifecycle:lifecycle-livedata:2.3.1")
     implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("androidx.fragment:fragment:1.3.6")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

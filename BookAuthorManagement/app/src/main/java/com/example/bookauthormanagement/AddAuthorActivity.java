@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.bookauthormanagement.models.Author;
@@ -35,13 +36,13 @@ public class AddAuthorActivity extends AppCompatActivity {
         // Check if there's an existing author to edit
         if (getIntent().hasExtra("authorId")) {
             authorId = getIntent().getIntExtra("authorId", -1);
-            authorViewModel.getAuthors().observe(this, authors -> {
-                for (Author author : authors) {
-                    if (author.getId() == authorId) {
+            authorViewModel.getAuthorById(authorId).observe(this, new Observer<Author>() {
+                @Override
+                public void onChanged(Author author) {
+                    if (author != null) {
                         editTextAuthorName.setText(author.getName());
                         editTextAddress.setText(author.getAddress());
                         editTextPhone.setText(author.getPhone());
-                        break;
                     }
                 }
             });

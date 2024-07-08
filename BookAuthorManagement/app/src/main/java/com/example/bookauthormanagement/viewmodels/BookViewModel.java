@@ -11,15 +11,19 @@ import com.example.bookauthormanagement.dao.BookDao;
 import com.example.bookauthormanagement.models.Book;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BookViewModel extends AndroidViewModel {
     private BookDao bookDao;
     private MutableLiveData<List<Book>> booksLiveData;
+    private ExecutorService executorService;
 
     public BookViewModel(@NonNull Application application) {
         super(application);
         bookDao = new BookDao(application);
         booksLiveData = new MutableLiveData<>();
+        executorService = Executors.newFixedThreadPool(2);
     }
 
     public LiveData<List<Book>> getBooks() {
@@ -35,6 +39,16 @@ public class BookViewModel extends AndroidViewModel {
         List<Book> books = bookDao.getBooksByAuthorId(authorId);
         booksLiveData.setValue(books);
     }
+
+    public LiveData<Book> getBookById(int bookId) {
+        MutableLiveData<Book> book = new MutableLiveData<>();
+        executorService.execute(() -> {
+            Book fetchedBook = bookDao.getBookById(bookId);
+            book.postValue(fetchedBook);
+        });
+        return book;
+    }
+
 
     public void insertBook(Book book) {
         bookDao.insertBook(book);

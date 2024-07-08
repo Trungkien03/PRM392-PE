@@ -58,4 +58,22 @@ public class AuthorDao {
         }
         return authors;
     }
+
+    public Author getAuthorById(int authorId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(DatabaseHelper.TABLE_AUTHOR, null, DatabaseHelper.COLUMN_AUTHOR_PRIMARY_ID + " = ?", new String[]{String.valueOf(authorId)}, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            Author author = new Author(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_AUTHOR_PRIMARY_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_AUTHOR_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ADDRESS)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PHONE))
+            );
+            cursor.close();
+            return author;
+        } else {
+            return null;
+        }
+    }
+
 }

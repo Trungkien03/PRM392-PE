@@ -6,6 +6,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.bookauthormanagement.models.Author;
@@ -15,10 +16,12 @@ import com.example.bookauthormanagement.viewmodels.BookViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.List;
+
 public class AddBookActivity extends AppCompatActivity {
 
     private TextInputEditText editTextBookName, editTextPublishDate, editTextGenre;
-    private Spinner spinnerAuthors, spinnerGender;
+    private Spinner spinnerAuthors;
     private BookViewModel bookViewModel;
     private AuthorViewModel authorViewModel;
     private int bookId = -1;
@@ -40,37 +43,38 @@ public class AddBookActivity extends AppCompatActivity {
         bookViewModel = new ViewModelProvider(this).get(BookViewModel.class);
         authorViewModel = new ViewModelProvider(this).get(AuthorViewModel.class);
 
-        authorViewModel.getAuthors().observe(this, authors -> {
-            ArrayAdapter<Author> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, authors);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerAuthors.setAdapter(adapter);
-        });
+        authorViewModel.getAuthors().observe(this, new Observer<List<Author>>() {
+            @Override
+            public void onChanged(List<Author> authors) {
+                ArrayAdapter<Author> adapter = new ArrayAdapter<>(AddBookActivity.this, android.R.layout.simple_spinner_item, authors);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerAuthors.setAdapter(adapter);
 
-
-
-        authorViewModel.loadAuthors();
-
-        // Check if there's an existing book to edit
-        if (getIntent().hasExtra("bookId")) {
-            bookId = getIntent().getIntExtra("bookId", -1);
-            bookViewModel.getBooks().observe(this, books -> {
-                for (Book book : books) {
-                    if (book.getId() == bookId) {
-                        editTextBookName.setText(book.getName());
-                        editTextPublishDate.setText(book.getPublishDate());
-                        editTextGenre.setText(book.getGenre());
-                        // Set author spinner selection
-                        for (int i = 0; i < spinnerAuthors.getAdapter().getCount(); i++) {
-                            if (((Author) spinnerAuthors.getItemAtPosition(i)).getId() == book.getAuthorId()) {
-                                spinnerAuthors.setSelection(i);
-                                break;
+                // Check if there's an existing book to edit
+                if (getIntent().hasExtra("bookId")) {
+                    bookId = getIntent().getIntExtra("bookId", -1);
+                    bookViewModel.getBookById(bookId).observe(AddBookActivity.this, new Observer<Book>() {
+                        @Override
+                        public void onChanged(Book book) {
+                            if (book != null) {
+                                editTextBookName.setText(book.getName());
+                                editTextPublishDate.setText(book.getPublishDate());
+                                editTextGenre.setText(book.getGenre());
+                                // Set author spinner selection
+                                for (int i = 0; i < spinnerAuthors.getAdapter().getCount(); i++) {
+                                    if (((Author) spinnerAuthors.getItemAtPosition(i)).getId() == book.getAuthorId()) {
+                                        spinnerAuthors.setSelection(i);
+                                        break;
+                                    }
+                                }
                             }
                         }
-                        break;
-                    }
+                    });
                 }
-            });
-        }
+            }
+        });
+
+        authorViewModel.loadAuthors();
     }
 
     private void saveBook() {
@@ -78,7 +82,6 @@ public class AddBookActivity extends AppCompatActivity {
         String publishDate = editTextPublishDate.getText().toString().trim();
         String genre = editTextGenre.getText().toString().trim();
         Author selectedAuthor = (Author) spinnerAuthors.getSelectedItem();
-
 
         if (bookName.isEmpty() || publishDate.isEmpty() || genre.isEmpty() || selectedAuthor == null) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
