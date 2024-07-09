@@ -12,8 +12,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_BOOK = "Sach";
     public static final String TABLE_AUTHOR = "Tacgia";
 
-    // Common column names
-    public static final String COLUMN_ID = "id";
 
     // BOOK table column names
     public static final String COLUMN_BOOK_ID = "Masach";
