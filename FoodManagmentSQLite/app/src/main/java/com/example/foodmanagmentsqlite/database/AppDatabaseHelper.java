@@ -5,8 +5,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.Nullable;
-
 public class AppDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "food_management.db";
     private static final int DATABASE_VERSION = 2;
